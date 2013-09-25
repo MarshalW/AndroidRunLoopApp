@@ -7,11 +7,16 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MyActivity extends Activity {
 
     private static String TAG = "RunLoopApp";
 
     LooperThread looperThread;
+
+    Timer timer;
 
     /**
      * Called when the activity is first created.
@@ -29,18 +34,20 @@ public class MyActivity extends Activity {
         looperThread = new LooperThread();
         looperThread.start();
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                looperThread.mHandler.handleMessage(Message.obtain());
+                looperThread.mHandler.sendMessage(Message.obtain());
             }
-        }, 1000 * 3);
+        }, 0, 1000);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        timer.cancel();
         looperThread.mHandler.post(new Runnable() {
             @Override
             public void run() {
